@@ -48,7 +48,11 @@ public class FifoQueue<E> extends AbstractQueue<E> implements Queue<E> {
 	 * 			if this queue is empty
 	 */
 	public E peek() {
-		return null;
+		if(last == null) {
+			return null;
+		} else {
+			return last.element;
+		}
 	}
 
 	/**	
@@ -58,6 +62,23 @@ public class FifoQueue<E> extends AbstractQueue<E> implements Queue<E> {
 	 * @return 	the head of this queue, or null if the queue is empty 
 	 */
 	public E poll() {
+		if(last!= null) {
+			if(last.next==last) {
+				E e = last.element;
+				last = null;
+				size = 0;
+				return e;
+			} else {
+				QueueNode<E> tmp = last.next;
+				while(tmp.next != last) {
+					tmp = tmp.next;					
+				}
+				E e = tmp.next.element;
+				last = tmp;
+				size--;
+				return e;				
+			}
+		}
 		return null;
 	}
 	
