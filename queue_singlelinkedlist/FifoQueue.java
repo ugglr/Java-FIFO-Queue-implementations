@@ -19,18 +19,17 @@ public class FifoQueue<E> extends AbstractQueue<E> implements Queue<E> {
 	 * 			to this queue, else false
 	 */
 	public boolean offer(E e) {
-		if(last == null) {
+		if(last==null) {
 			last = new QueueNode<E>(e);
 			last.next = last;
-			size++;
-			return true;
 		} else {
 			QueueNode<E> tmp = new QueueNode<E>(e);
 			tmp.next = last.next;
 			last.next = tmp;
-			size++;
-			return true;
+			last = tmp;	
 		}
+		size++;
+		return true;
 	}
 	
 	/**	
@@ -51,7 +50,7 @@ public class FifoQueue<E> extends AbstractQueue<E> implements Queue<E> {
 		if(last == null) {
 			return null;
 		} else {
-			return last.element;
+			return last.next.element;
 		}
 	}
 
@@ -62,24 +61,20 @@ public class FifoQueue<E> extends AbstractQueue<E> implements Queue<E> {
 	 * @return 	the head of this queue, or null if the queue is empty 
 	 */
 	public E poll() {
-		if(last!= null) {
-			if(last.next==last) {
-				E e = last.element;
+		if(last == null) {
+			return null;			
+		} else {
+			QueueNode<E> tmp = last.next;
+			
+			if(this.size==1) {
 				last = null;
-				size = 0;
-				return e;
 			} else {
-				QueueNode<E> tmp = last.next;
-				while(tmp.next != last) {
-					tmp = tmp.next;					
-				}
-				E e = tmp.next.element;
-				last = tmp;
-				size--;
-				return e;				
+				last.next = tmp.next;	
 			}
+			
+			size--;			
+			return tmp.element;
 		}
-		return null;
 	}
 	
 	/**	
@@ -87,28 +82,48 @@ public class FifoQueue<E> extends AbstractQueue<E> implements Queue<E> {
 	 * @return an iterator over the elements in this queue
 	 */	
 	public Iterator<E> iterator() {
-		
-		return null;
+		return new QueueIterator();
 	}
 	
 	private class QueueIterator implements Iterator<E> {
 		private QueueNode<E> pos;
 		
-		//Constructor
 		private QueueIterator() {
-			
+			if(last == null) {
+				pos = null;
+			} else {
+				pos = last.next;
+			}
 		}
 		
 		@Override
+		/**
+		 * Returns true if the current position have element after
+		 */
 		public boolean hasNext() {
-			// TODO Auto-generated method stub
-			return false;
+			return pos != null;
 		}
 
 		@Override
+		/**
+		 * Returns the current element and moves one down in the Queue.
+		 */
 		public E next() {
-			// TODO Auto-generated method stub
-			return null;
+			if(hasNext()) {
+				E e = pos.element;
+				pos = pos.next;
+				
+				if(pos == last.next) {
+					pos=null;
+				}
+				return e;
+			} else {
+				throw new NoSuchElementException();
+			}
+		}
+		
+		public void remove() {
+			throw new UnsupportedOperationException();
 		}
 		
 	}
